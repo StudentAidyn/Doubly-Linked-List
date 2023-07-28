@@ -2,18 +2,9 @@
 #include "DLList.h"
 
 DLList::DLList() {
-	struct node* head;
 
 }
 
-DLList::DLList(int i) {
-	//constructor
-	struct node* head;
-	struct node* NewNode = new node;
-	NewNode->data = i;
-	NewNode->prev = NULL;
-	NewNode->next = NULL;
-}
 
 DLList::~DLList() {
 	//Destructor
@@ -37,6 +28,8 @@ void DLList::insertFront(struct node** head, int data) {
 
 
 	(*head) = NewNode;
+
+	std::cout << "Node inserted at FRONT with data -> " << data << std::endl;
 
 }
 
@@ -65,7 +58,8 @@ void DLList::insertEnd(struct node** head, int data) {
 
 	NewNode->prev = temp;
 
-	free(temp);
+	std::cout << "Node inserted at END with data -> " << data << std::endl;
+	//free(temp);
 
 }
 
@@ -87,7 +81,33 @@ void DLList::insertNode(struct node* prev_node, int data) {
 
 	if (NewNode->next != NULL)
 		NewNode->next->prev = NewNode;
+	std::cout << "Node inserted at [" << prev_node << "] with data -> " << data << std::endl;
+}
 
+void DLList::insertNode(struct node** head, int pos, int data) {
+	if (*head == NULL || pos <= 0) {
+		return;
+	}
+
+	struct node* temp = *head;
+
+	if (temp->next == NULL) {
+		deleteNode(head, temp);
+		return;
+	}
+
+	for (int i = 0; temp != NULL && i < pos; i++) {
+		if (temp) {
+			temp = temp->next;
+		}
+
+	}
+
+	if (temp == NULL) {
+		return;
+	}
+
+	insertNode(temp, data);
 }
 
 void DLList::deleteNode(struct node** head, struct node* del_node) {
@@ -107,7 +127,7 @@ void DLList::deleteNode(struct node** head, struct node* del_node) {
 	if (del_node->next != NULL) {
 		del_node->next->prev = del_node->prev;
 	}
-
+	std::cout << " - Deleted Node... [" << del_node->data << "]" << std::endl;
 	free(del_node);
 }
 
@@ -119,61 +139,141 @@ void DLList::deleteNode(struct node** head, int pos) {
 
 	struct node* temp = *head;
 
-
-	for (int i = 0; temp != NULL || i < pos; i++) {
-		temp = temp->next;
+	if (temp->next == NULL) {
+		deleteNode(head, temp);
+		return;
 	}
+
+	for (int i = 0; temp != NULL && i < pos; i++) {
+		if (temp) {
+			temp = temp->next;
+		}
+		
+	}
+
+	
 
 	if (temp == NULL) {
 		return;
 	}
 	
+	std::cout << "Deleting Node... " << pos;
+
 	deleteNode(head, temp);
-	free(temp);
 }
 
 int DLList::nodeTotal(struct node** head) {
 	
-	int count;
+	if ((*head) == NULL) {
+		return 0;
+	}
+
+	int count = 0;
 
 	struct node* temp = *head;
 
-	while (temp->next != NULL) {
+	while (temp != NULL) {
 		count++;
 		temp = temp->next;
-	}
+	} 
 
-	free(temp);
 
 	return count;
 
 }
 
 bool DLList::listEmpty(struct node** head) {
-	
 	if (*head == NULL) {
-		std::cout << "HEAD is NULL" << std::endl;
 		return true;
 	}
 	return false;
 }
 
 int DLList::startNode(struct node** head) {
-	
-
+	if (*head == NULL) {
+		std::cout << "NO First Node || NULL" << std::endl;
+		return NULL;
+	}
+	return (*head)->data;
 }
 
 int DLList::endNode(struct node** head) {
+	int returnNum = 0;
 
+	struct node* temp = *head;
+
+	while (temp->next != NULL) {
+		temp = temp->next;
+	}
+
+	returnNum = temp->data;
+	
+	return returnNum;
 }
 
 void DLList::displayNodes(struct node* head) {
+
+	struct node* last;
+	
 	while (head != NULL) {
 		std::cout << head->data << "->";
+		last = head;
 		head = head->next;
 	}
+	if (head == NULL)
+		std::cout << "NULL\n";
 }
 
-void DLList::sortList(struct node** head) {
+
+int DLList::NodeData(struct node** head, int pos) {
+
+	if (*head == NULL || pos <= 0) {
+		return 0;
+	}
+
+	struct node* temp = *head;
+
+	int counter = 0;
+
+	for (int j = 1; temp != NULL && j < pos; j++) { 
+		if (temp) {
+			temp = temp->next;
+		}
+		//counter++;
+		//std::cout << counter << std::endl;
+		
+	}
+
+	if (temp == NULL) {
+		return 0;
+	}
+
+	int jeb = temp->data;
+
+	return jeb;
+}
+
+void DLList::sortList(struct node** head, int nodeTotal) {
+
+	if ((*head) == NULL || (*head)->next == NULL) {
+		return;
+	}
+
+	int tempNum;
+	struct node* temp1 = *head;
+	struct node* temp2 = temp1->next;
+
+	for (int i = 0; i < nodeTotal - 1; i++) {
+		temp2 = temp1;
+		for (int j = 0; j < nodeTotal - i; j++) {
+			if (temp1->data > temp2->data) {
+				tempNum = temp1->data;
+				temp1->data = temp2->data;
+				temp2->data = tempNum;
+			}
+			temp2 = temp2->next;
+		}
+		temp1 = temp1->next;
+	}
 
 }

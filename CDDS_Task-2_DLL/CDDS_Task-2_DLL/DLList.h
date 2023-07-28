@@ -15,6 +15,7 @@ public:
 	void insertFront(struct node** head, int data);
 	void insertEnd(struct node** head, int data);
 	void insertNode(struct node* prev_node, int data);
+	void insertNode(struct node** prev_node, int pos, int data);
 	void deleteNode(struct node** head, struct node* del_node);
 	void deleteNode(struct node** head, int pos);
 	int nodeTotal(struct node** head);
@@ -22,6 +23,7 @@ public:
 	int startNode(struct node** head);
 	int endNode(struct node** head);
 	void displayNodes(struct node* head);
-	void sortList(struct node** head);
+	int NodeData(struct node** nd, int pos);
+	void sortList(struct node** head, int nodeTotal);
 };
 
