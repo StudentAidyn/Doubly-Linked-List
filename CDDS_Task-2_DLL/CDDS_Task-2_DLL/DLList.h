@@ -3,7 +3,6 @@ class DLList
 {
 public:
 	DLList();
-	DLList(int i);
 	~DLList();
 
 	struct node {
@@ -25,5 +24,7 @@ public:
 	void displayNodes(struct node* head);
 	int NodeData(struct node** nd, int pos);
 	void sortList(struct node** head, int nodeTotal);
+
+	void clearAllNodes(struct node** head);
 };
 

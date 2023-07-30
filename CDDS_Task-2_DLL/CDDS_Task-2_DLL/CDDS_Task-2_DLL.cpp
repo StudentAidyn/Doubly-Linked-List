@@ -20,7 +20,7 @@ int main()
     std::cout << "Empty List Check (1 = true, 0 = false): " << list.listEmpty(&head) << std::endl;
     std::cout << std::endl;
 
-    std::cout << "Adding 6 nodes to the List:" << std::endl;
+    std::cout << "Adding nodes to the List:" << std::endl;
     list.insertEnd(&head, 5);
     list.insertFront(&head, 4);
     list.insertFront(&head, 3);
@@ -35,6 +35,8 @@ int main()
     list.insertEnd(&head, 2);
     list.insertNode(head->next->next, 1);
     list.insertNode(&head, 3, 0);
+
+    list.insertNode(&head, 600, 7000); //test case: if position is set too high, it places it at the end
 
     /*following the order of the inserted nodes it should be displayed as the following:
     insertEnd       5 = [5->NULL]
@@ -66,8 +68,11 @@ int main()
     std::cout << std::endl;
 
     std::cout << "deleting 2 NODES: " << std::endl;
-    list.deleteNode(&head, 8);
+    list.deleteNode(&head, 5);
     list.deleteNode(&head, head->next);
+    std::cout << "TESTING if it will delete node while being out of range of List: " << std::endl;
+    list.deleteNode(&head, 7); //example of delete request not going through 
+
     /* Description:
     deleteNode  (3) = head->[0->1->2->{3}->4->5] => head->[0->1->2->->4->5] => head->[0->1->2->4->5]
         Deletes Node based on an integer position.
@@ -82,6 +87,19 @@ int main()
     std::cout << "First and Last Node Data: " << list.startNode(&head) << "...." << list.endNode(&head) << std::endl;
     std::cout << std::endl;
 
+    list.clearAllNodes(&head);
+
+    std::cout << "Doubly Linked List Display AFTER clearing all NODES: " << std::endl;
+    list.displayNodes(head);
+    std::cout << "Total Nodes Currently: " << list.nodeTotal(&head) << std::endl;
+    std::cout << "Empty List Check (1 = true, 0 = false): " << list.listEmpty(&head) << std::endl;
+    std::cout << "First and Last Node Data: " << list.startNode(&head) << "...." << list.endNode(&head) << std::endl;
+    std::cout << std::endl;
+
+    free(head);
+
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "Program END" << std::endl;
 
     return 0;
 }
