@@ -1,0 +1,7 @@
+Links used for CDDS task 2:
+
+https://www.programiz.com/dsa/doubly-linked-list
+
+https://www.softwaretestinghelp.com/doubly-linked-list-2/
+
+https://www.tutorialspoint.com/delete-a-doubly-linked-list-node-at-a-given-position-in-cplusplus

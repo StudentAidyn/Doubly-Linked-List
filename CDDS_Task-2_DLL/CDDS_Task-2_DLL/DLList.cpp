@@ -5,199 +5,233 @@ DLList::DLList() {
 
 }
 DLList::~DLList() {
-	//Destructor
+	clearAllNodes();
 }
 //---------------------------------------------
 
 //Node insert/add functions---------------------------------------------------------+
-void DLList::insertFront(struct node** head, int data) {
+void DLList::insertFront(int data) {
 	
 	struct node* NewNode = new node;
 
 	NewNode->data = data;
-	
-	NewNode->next = (*head);
-	/*the reason NewNode->next is set to head : 
-	insertFront(&head, 2) 
-	0->1->2->3		|0 is considered head and will be after 2 when inserted as shown.
-	2->0->1->2->3	|as can be seen 0 is now behind 2 and 2 is the new head.*/
-	NewNode->prev = NULL;
-	//set previous to NULL to signify it is the HEAD/START/FRONT. :O  <- shock
-	if ((*head) != NULL) {
-		(*head)->prev = NewNode;
-	}	
-	/*if head which is the now the next node[NewNode->Head]
-	and now head needs to link back to NewNode if it has a 
-	value and isn't NULL: [NewNode <- Head] 
-	In the end [NewNode <=> Head]*/
-	(*head) = NewNode;
+
+	if (Empty()) {
+		head = end = NewNode;
+	}
+	else {
+		NewNode->next = head;
+		/*the reason NewNode->next is set to head :
+		insertFront(&head, 2)
+		0->1->2->3		|0 is considered head and will be after 2 when inserted as shown.
+		2->0->1->2->3	|as can be seen 0 is now behind 2 and 2 is the new head.*/
+		NewNode->prev = nullptr;
+		//set previous to nullptr to signify it is the HEAD/START/FRONT. :O  <- shock
+		if (head != nullptr) {
+			head->prev = NewNode;
+		}
+		head = NewNode;
+		/*if head which is the now the next node[NewNode->Head]
+		and now head needs to link back to NewNode if it has a
+		value and isn't nullptr: [NewNode <- Head]
+		In the end [NewNode <=> Head]*/
+	}
+
 	//NewNode is Declared as the HEAD
 	std::cout << "Node inserted at FRONT with data -> " << data << std::endl;
 }
 
-void DLList::insertEnd(struct node** head, int data) {
+void DLList::insertEnd(int data) {
 	
 	struct node* NewNode = new node;
-
 	NewNode->data = data;
-
-	NewNode->next = NULL;
-
-	struct node* temp = *head;
-
-	if (*head == NULL) { //Head node is NULL, true: NewNode is declared the HEAD, since it is first Node
-		NewNode->prev = NULL;
-		*head = NewNode;
-		return;
+	if (Empty()) {
+		head = end = NewNode;
 	}
-
-	while (temp->next != NULL) { //loops through nodes until found original END node
-		temp = temp->next;
+	else {
+		NewNode->next = nullptr;
+		NewNode->prev = end;
+		end->next = NewNode;
+		end = NewNode;
 	}
-
-	temp->next = NewNode;
-	//makes original node Point 'next' value at NewNode
-	NewNode->prev = temp;
-	//and sets previous to original end node.
+	
 	std::cout << "Node inserted at END with data -> " << data << std::endl;
 }
 
-void DLList::insertNode(struct node* prev_node, int data) {
-	
-	if (prev_node == NULL) {
-		std::cout << "Previous node CANNOT be NULL" << std::endl;
+void DLList::insertNode(int pos, int data) {
+
+	if (Empty() || pos < 0) {
 		return;
 	}
-
-	struct node* NewNode = new node;
-
-	NewNode->data = data;
-
-	//1:
-	NewNode->next = prev_node->next; 
-	prev_node->next = NewNode;
-
-	//2:
-	NewNode->prev = prev_node;
-
-
-	//3:
-	if (NewNode->next != NULL) {
-		NewNode->next->prev = NewNode;
+	if (pos >= nodeTotal()) {
+		insertEnd(data);
 	}
-
-	/*	0:	[Prev_node]	<=>	[prev_node->next]
-
-		1:	[NewNode]	->	[prev_node->next] (NewNode points to original (prev_node) NEXT node)
-			[Prev_node]	->	[NewNode] (previous points to NewNode)
-
-		2:	[Prev_node] <=>	[NewNode]	->	[prev_node->next] (NewNode points to prev_node as well as the next node)
-			
-		3:a	[Prev_node]	<=>	[NewNode]<=>[prev_node->next]
-		If NewNode->next does not = NULL meaning it is a Node
-
-		3:b	[Prev_node]	<=>	[NewNode]->[prev_node->next(NULL)]
-		if NewNode->next does = NULL then it is now at the END, so it is the NEW END
-	*/
-	std::cout << "Node inserted at [" << prev_node << "] with data -> " << data << std::endl;
-}
-
-void DLList::insertNode(struct node** head, int pos, int data) {
-
-	if (*head == NULL || pos <= 0) {
-		return;
+	else if ( pos == 0){
+		insertFront(data);
 	}
+	else {
+		node* prev_node = head;
 
-	struct node* temp = *head;
-
-	if (temp->next == NULL) {
-		deleteNode(head, temp);
-		return;
-	}
-
-	for (int i = 0; temp->next != NULL && i < pos; i++) {
-		if (temp) {
-			temp = temp->next;
+		for (int i = 0; prev_node->next != nullptr && i < pos; i++) {
+			if (prev_node) {
+				prev_node = prev_node->next;
+			}
 		}
-	}
-	//for loop which checks if next is Not NULL or i is within Position Bounds
+		//for loop which checks if next is Not nullptr or i is within Position Bounds
 
-	insertNode(temp, data);
-	//uses other insertNode to not duplicate code
+		node* temp = new node;
+		temp->data = data;
+
+		//1:
+		temp->next = prev_node->next;
+		prev_node->next = temp;
+
+		//2:
+		temp->prev = prev_node;
+
+		//3:
+		if (temp->next != nullptr) {
+			temp->next->prev = temp;
+		}
+
+		/*	0:	[Prev_node]	<=>	[prev_node->next]
+
+			1:	[NewNode]	->	[prev_node->next] (NewNode points to original (prev_node) NEXT node)
+				[Prev_node]	->	[NewNode] (previous points to NewNode)
+
+			2:	[Prev_node] <=>	[NewNode]	->	[prev_node->next] (NewNode points to prev_node as well as the next node)
+
+			3:a	[Prev_node]	<=>	[NewNode]<=>[prev_node->next]
+			If NewNode->next does not = nullptr meaning it is a Node
+
+			3:b	[Prev_node]	<=>	[NewNode]->[prev_node->next(nullptr)]
+			if NewNode->next does = nullptr then it is now at the END, so it is the NEW END
+		*/
+	}
+
+	std::cout << "Node inserted with data -> " << data << std::endl;
+
 }
 //-------------------------------------------------------------------------------------------------
 
 
 
 //Node Deletion Functions--------------------------------------------------------------------------
-void DLList::deleteNode(struct node** head, struct node* del_node) {
-
-	if (*head == NULL || del_node == NULL) {
-		return;
-	}
-	//1
-	if (*head == del_node) {
-		*head = del_node->next;
-	}
-	//2
-	if (del_node->prev != NULL) {
-		del_node->prev->next = del_node->next;
-	}
-	//3
-	if (del_node->next != NULL) {
-		del_node->next->prev = del_node->prev;
-	}
-	/*
-	del = del_node
-	1:
-	[head/del]<=>[del->next]....
-	head and delete are the same meaning head has to point to del->next
-	
-	2:
-	[!NULL] <=> [del] ==> (del->prev->next =)[!NULL->next = del->next]
-	It sets the Previous node's next ndoe value to equal deletes next node value
-
-	3:
-	[del] <=> [!NULL] ==> (del->next->prev =)[!NULL->prev = del->prev]
-	It sets the Next node's prev node value to equal deletes previos node value
-
-	Successfully removing the Node
-	*/
-
-	std::cout << " - Deleted Node... [" << del_node->data << "]" << std::endl;
-	free(del_node);
-	//then freeing the node from memory entirely
-}
-
-//this function works the exact same as the insert node integer position but it doesn't delete the end node if too high;
-void DLList::deleteNode(struct node** head, int pos) {
+void DLList::deleteNodeP(int pos) {
 	int i = 0;
-	if (*head == NULL || pos <= 0) {
+	if (Empty() || pos < 0 || pos > nodeTotal()) {
+		std::cout << "Number Not in Range, Range is 0 - " << nodeTotal() << std::endl;
 		return;
 	}
 
-	struct node* temp = *head;
+	node* temp = head;
 
-	if (temp->next == NULL) {
-		deleteNode(head, temp);
-		return;
-	}
-
-	for (i = 0; temp->next != NULL && i < pos; i++) {
+	for (i = 0; temp != end && i < pos; i++) {
 		if (temp) {
 			temp = temp->next;
 		}
 	}
 
-	if (temp->next == NULL && i != pos) {
+	if (temp->next == nullptr && i != pos) {
 		std::cout << "ERROR: Delete Request Out Of RANGE" << std::endl;
 		return;
 	}
 	
 	std::cout << "Deleting Node... " << pos;
 
-	deleteNode(head, temp);
-	//uses other delete function using the found temporary function
+	//1
+	if (head == temp) {
+		head = temp->next;
+	}
+	//2
+	if (temp->prev != NULL) {
+		temp->prev->next = temp->next;
+	}
+	//3
+	if (temp->next != nullptr) {
+		temp->next->prev = temp->prev;
+	}
+	/*
+	del = del_node
+	1:
+	[head/del]<=>[del->next]....
+	head and delete are the same meaning head has to point to del->next
+
+	2:
+	[!nullptr] <=> [del] ==> (del->prev->next =)[!nullptr->next = del->next]
+	It sets the Previous node's next node value to equal deletes next node value
+
+	3:
+	[del] <=> [!nullptr] ==> (del->next->prev =)[!nullptr->prev = del->prev]
+	It sets the Next node's prev node value to equal deletes previos node value
+
+	Successfully removing the Node
+	*/
+
+	std::cout << " - Deleted Node... [" << temp->data << "]" << std::endl;
+	delete(temp);
+	//then freeing the node from memory entirely
+}
+
+void DLList::deleteNodeN(int num) {
+	int counter = 0;
+
+	if (Empty()) {
+		return;
+	}
+
+	node* temp = head;
+	displayNodes();
+
+	while (temp != NULL) {
+		if (temp->data == num) {
+			break;
+		}
+		temp = temp->next;
+		counter++;
+	}
+
+	if (temp == nullptr) {
+		std::cout << "Number " << num <<" could NOT be FOUND" << std::endl;
+		return;
+	}
+	
+	deleteNodeP(counter);
+
+}
+
+void DLList::deleteFront() {
+	if (Empty()) {
+		return;
+	}
+	node* delF = new node;
+	delF = head;
+	head = head->next;
+	if (head != nullptr) {
+		head->prev = nullptr;
+	}
+	else {
+		end = nullptr;	
+	}
+	std::cout << "deleted current front node " << delF->data << std::endl;
+	delete(delF);
+}
+
+void DLList::deleteEnd() {
+	if (Empty()) {
+		return;
+	}
+	node* delE = new node;
+	delE = end;
+	end = end->next;
+	if (end != nullptr) {
+		end->prev = nullptr;
+	}
+	else {
+		head = nullptr;
+	}
+	std::cout << "deleted current end node " << delE->data << std::endl;
+	delete(delE);
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -205,17 +239,17 @@ void DLList::deleteNode(struct node** head, int pos) {
 //Node Detail Functions-----------------------------------------------------------------------------
 
 //returns total number of nodes
-int DLList::nodeTotal(struct node** head) {
+int DLList::nodeTotal() {
 	
-	if ((*head) == NULL) {
+	if (head == nullptr) {
 		return 0;
 	}
 
 	int count = 0;
 
-	struct node* temp = *head;
+	node* temp = head;
 
-	while (temp != NULL) { //loop counts how many nodes it has passed untill it becomes NULL
+	while (temp != nullptr) { //loop counts how many nodes it has passed untill it becomes nullptr
 		count++;
 		temp = temp->next;
 	} 
@@ -223,97 +257,102 @@ int DLList::nodeTotal(struct node** head) {
 	return count;
 }
 
-bool DLList::listEmpty(struct node** head) {
-	if (*head == NULL) { 
+bool DLList::Empty() {
+	if (head == nullptr) { 
 		return true;
 	}
 	return false;
 	//head should always have a value if even if 1 node is added, 
-	//if not then it will be NULL, meaning it is empty
+	//if not then it will be nullptr, meaning it is empty
+}
 
-}
 //returns start node data
-int DLList::startNode(struct node** head) {
-	if (*head == NULL) {
-		std::cout << "NO Nodes || NULL" << std::endl;
-		return NULL;
+int DLList::startNode() {
+	if (head == nullptr) {
+		std::cout << "NO Nodes || nullptr" << std::endl;
+		return -1;
 	}
-	return (*head)->data;
+	return head->data;
 }
+
 //returns endnode data
-int DLList::endNode(struct node** head) {
+int DLList::endNode() {
 	
-	if ((*head) == NULL) {
-		std::cout << "NO Nodes || NULL" << std::endl;
-		return 0;
+	if (head == nullptr) {
+		std::cout << "NO Nodes || nullptr" << std::endl;
+		return -1;
 	}
 
 	int returnNum = 0;
 
-	struct node* temp = *head;
-
-	while (temp->next != NULL) { //loops until the next node IS NULL indicating it is the END node
-		temp = temp->next;
-	}
-
-	returnNum = temp->data;
+	returnNum = end->data;
 	
 	return returnNum;
 }
 
-void DLList::displayNodes(struct node* head) {
+void DLList::displayNodes() {
 
-	struct node* last;
-	
-	while (head != NULL) {
-		std::cout << head->data << "->";
-		last = head;
-		head = head->next;
+	node* Current = head;
+
+	while (Current != nullptr) {
+		std::cout << Current->data;
+		if (Current->next != nullptr) {
+			std::cout << "<=>";
+		}
+		else {
+			std::cout << "->";
+		}
+		Current = Current->next;
 	}
-	if (head == NULL) {
-		std::cout << "NULL\n";
+	if (Current == nullptr) {
+		std::cout << "nullptr\n";
 	}
 }
 
 //returns Node data, with integer input
-int DLList::NodeData(struct node** head, int pos) {
+int DLList::NodeData(int pos) {
 
-	if (*head == NULL || pos <= 0) {
-		return 0;
+	if (head == nullptr || pos < 0 || pos > nodeTotal()) {
+		std::cout << "ERROR" << std::endl;
+		return -1;
 	}
+	if (pos == 0) {
+		return startNode();
+	}
+	else if (pos == nodeTotal()) {
+		return endNode();
+	}
+	else {
+		node* temp = head;
 
-	struct node* temp = *head;
+		int counter = 0;
 
-	int counter = 0;
-
-	for (int j = 1; temp != NULL && j < pos; j++) { 
-		if (temp) {
-			temp = temp->next;
+		for (int j = 1; temp != NULL && j < pos; j++) {
+			if (temp) {
+				temp = temp->next;
+			}
 		}
+
+		int jeb = temp->data;
+
+		return jeb;
 	}
-
-	if (temp == NULL) {
-		return 0;
-	}
-
-	int jeb = temp->data;
-
-	return jeb;
 }
 //-------------------------------------------------------------------------------------------------
 
 
 
 //Sort
-void DLList::sortList(struct node** head, int nodeTotal) {
+void DLList::sortList(int nodeTotal) {
 
-	if ((*head) == NULL || (*head)->next == NULL) {
+	if (head == nullptr || head->next == nullptr) {
+		std::cout << "No Values or Not enough Values needed to sort" << std::endl;
 		return;
 	}
 	
 	int tempNum;
-	struct node* temp1 = *head;
-	struct node* temp2 = temp1->next; //having 2 separate temp nodes allows for an easier sort
+	node* temp1 = head;
+	node* temp2 = temp1->next; //having 2 separate temp nodes allows for an easier sort
 
 	//this program uses a bubble sort algorithm to sort the list
 	for (int i = 0; i < nodeTotal - 1; i++) {
@@ -335,14 +374,15 @@ void DLList::sortList(struct node** head, int nodeTotal) {
 
 
 //Clear List
-void DLList::clearAllNodes(struct node** head) {
+void DLList::clearAllNodes() {
 
-	struct node* temp = new node;
-
-	while ((*head) != NULL) {
-		temp = (*head);
-		(*head) = (*head)->next;
-		free(temp);
+	node* del = head;
+	std::cout << "deleting node: ";
+	while (head != nullptr) {
+		del = head;
+		head = head->next;
+		std::cout  << del->data;
+		delete(del);
 	}
 
 	std::cout << "All nodes are deleted successfully.\n";

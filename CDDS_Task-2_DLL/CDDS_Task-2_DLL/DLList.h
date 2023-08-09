@@ -11,20 +11,25 @@ public:
 		struct node* next;
 	};
 
-	void insertFront(struct node** head, int data);
-	void insertEnd(struct node** head, int data);
-	void insertNode(struct node* prev_node, int data);
-	void insertNode(struct node** prev_node, int pos, int data);
-	void deleteNode(struct node** head, struct node* del_node);
-	void deleteNode(struct node** head, int pos);
-	int nodeTotal(struct node** head);
-	bool listEmpty(struct node** head);
-	int startNode(struct node** head);
-	int endNode(struct node** head);
-	void displayNodes(struct node* head);
-	int NodeData(struct node** nd, int pos);
-	void sortList(struct node** head, int nodeTotal);
+	node* head = NULL;
+	node* end = head;
 
-	void clearAllNodes(struct node** head);
+
+	void insertFront(int data);
+	void insertEnd(int data);
+	void insertNode(int pos, int data);
+	void deleteFront();
+	void deleteEnd();
+	void deleteNodeP(int pos);
+	void deleteNodeN(int num);
+	int nodeTotal();
+	bool Empty();
+	int startNode();
+	int endNode();
+	void displayNodes();
+	int NodeData(int pos);
+	void sortList(int nodeTotal);
+
+	void clearAllNodes();
 };
 
